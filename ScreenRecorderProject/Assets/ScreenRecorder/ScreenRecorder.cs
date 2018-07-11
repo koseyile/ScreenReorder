@@ -40,7 +40,7 @@ public class ScreenRecorder : MonoBehaviour
     private int once3;
     private int once4;
     private int CurrentFrame = -1;
-    public bool ExportGIF = false;
+    private bool ExportGIF = false;
     public bool Recording = false;
     private int Recordstate = 0;
     private int defaultfps;
@@ -49,6 +49,8 @@ public class ScreenRecorder : MonoBehaviour
 
     public Camera m_camera;
     private Canvas m_canvas;
+
+    private const bool outputPNG = true;
 
     void Start()
     {
@@ -66,10 +68,23 @@ public class ScreenRecorder : MonoBehaviour
         //print ("Recording"+pname);
         if (System.IO.File.Exists("Recording" + pname))
         {
-            Process.Start("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo_choose.bat");
-            print("Untiy已经暂停，请手动恢复运行");
-            EditorApplication.isPaused = true;
-            //print ("文件夹存在,创建");
+
+            if (outputPNG)
+            {
+                print("Recording文件夹存在,先删除再创建");
+                string ss = Application.dataPath + "/../" + "Recording";
+                print(ss);
+                Directory.Delete(Application.dataPath+"/../"+"Recording", true);
+                Directory.CreateDirectory(Application.dataPath + "/../" + "Recording");
+            }
+            else
+            {
+                Process.Start("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo_choose.bat");
+                print("Untiy已经暂停，请手动恢复运行");
+                EditorApplication.isPaused = true;
+                //print ("文件夹存在,创建");
+            }
+
         }
 
         defaultfps = Time.captureFramerate;
@@ -206,7 +221,17 @@ public class ScreenRecorder : MonoBehaviour
         {
             if (once3 == 0)
             {
-                System.IO.Directory.CreateDirectory(RecordName);
+
+                if (outputPNG)
+                {
+                    Directory.Delete(Application.dataPath + "/../" + "Recording", true);
+                    Directory.CreateDirectory(Application.dataPath + "/../" + "Recording");
+                }
+                else
+                {
+                    System.IO.Directory.CreateDirectory(RecordName);
+                }
+
                 System.IO.Directory.CreateDirectory("RecordVideo");
                 once3 = 1;
                 print("Untiy正在录制...");
@@ -233,18 +258,37 @@ public class ScreenRecorder : MonoBehaviour
                 StartRecordC = 0;
                 once2 = 1;
                 once3 = 0;
-                
-                if (ExportGIF)
+
+                if (outputPNG)
                 {
-                    Process.Start ("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo.bat");  
+
                 }
                 else
                 {
-                    Process.Start ("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo_nogif.bat");  
+                    if (ExportGIF)
+                    {
+                        //Process.Start ("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo.bat");  
+                    }
+                    else
+                    {
+                        //Process.Start ("Assets\\ScreenRecorder\\ffmpeg\\Inputvideo_nogif.bat");  
+                    }
                 }
+
+
                 
                 Time.captureFramerate = defaultfps;
-                print("录制视频压制到: 工程根目录\\Recordvideo");
+
+                if (outputPNG)
+                {
+                    print("录制视频压制到: 工程根目录\\"+ RecordName); 
+                }
+                else
+                {
+                    print("录制视频压制到: 工程根目录\\Recordvideo");
+                }
+
+
             }
         }
         
