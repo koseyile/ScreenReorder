@@ -75,7 +75,6 @@ public class ScreenRecorder : MonoBehaviour
                 string ss = Application.dataPath + "/../" + "Recording";
                 print(ss);
                 Directory.Delete(Application.dataPath+"/../"+"Recording", true);
-                Directory.CreateDirectory(Application.dataPath + "/../" + "Recording");
             }
             else
             {
@@ -84,8 +83,9 @@ public class ScreenRecorder : MonoBehaviour
                 EditorApplication.isPaused = true;
                 //print ("文件夹存在,创建");
             }
-
         }
+
+        Directory.CreateDirectory(Application.dataPath + "/../" + "Recording");
 
         defaultfps = Time.captureFramerate;
         frameRatedata = "set frame=" + frameRate;
@@ -224,7 +224,11 @@ public class ScreenRecorder : MonoBehaviour
 
                 if (outputPNG)
                 {
-                    Directory.Delete(Application.dataPath + "/../" + "Recording", true);
+                    if (Directory.Exists(Application.dataPath + "/../" + "Recording"))
+                    {
+                        Directory.Delete(Application.dataPath + "/../" + "Recording", true);
+                    }
+
                     Directory.CreateDirectory(Application.dataPath + "/../" + "Recording");
                 }
                 else
